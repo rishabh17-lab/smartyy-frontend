@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smartyy - AI Cover Letter Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c63ff;
+            --primary-light: #a29bfe;
+            --secondary: #00cec9;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #e17055;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --white: #ffffff;
+            --gray: #dfe6e9;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: var(--dark);
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .steps-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 300px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary-light);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(108, 99, 255, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+
+        #resumeFile {
+            display: none;
+        }
+
+        .textarea-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 1px solid var(--gray);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        }
+
+        .voice-input {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .voice-input:hover {
+            background: var(--primary-light);
+            transform: scale(1.1);
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--gray);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a52e0;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #00b5ad;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: rgba(108, 99, 255, 0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .preview-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .letter-preview {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            min-height: 800px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .template-1 {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+
+        .template-2 {
+            font-family: 'Lora', serif;
+            line-height: 1.7;
+        }
+
+        .template-3 {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.5;
+        }
+
+        .theme-light {
+            background: white;
+            color: #333;
+        }
+
+        .theme-professional {
+            background: #f9f9f9;
+            color: #222;
+        }
+
+        .theme-creative {
+            background: #f8f9fa;
+            color: #2d3436;
+        }
+
+        .resume-info {
+            background: rgba(108, 99, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .resume-info h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .resume-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .resume-section {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .resume-section h4 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .resume-section p, .resume-section ul {
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        .resume-section ul {
+            padding-left: 20px;
+        }
+
+        .skill-match {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .skill-name {
+            width: 120px;
+            font-size: 0.85rem;
+        }
+
+        .match-bar {
+            flex: 1;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .match-fill {
+            height: 100%;
+            background: var(--success);
+            border-radius: 4px;
+        }
+
+        .match-percent {
+            width: 40px;
+            text-align: right;
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        .smart-tips {
+            background: rgba(0, 206, 201, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .smart-tips h3 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .smart-tips ul {
+            padding-left: 20px;
+        }
+
+        .smart-tips li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .toggle-tips {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .user-form {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gray);
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray);
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .contact-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--gray);
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .steps-container {
+                flex-direction: column;
+            }
+            
+            .step {
+                width: 100%;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .letter-preview {
+                padding: 20px;
+                min-height: 600px;
+            }
+
+            .preview-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .preview-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .resume-details {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .step {
+                padding: 20px;
+            }
+            
+            .upload-area {
+                padding: 20px;
+            }
+            
+            .letter-preview {
+                min-height: 500px;
+            }
+        }
+
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="logo">Smartyy</h1>
+            <p class="tagline">The world's most advanced AI-powered cover letter generator</p>
+        </header>
+
+        <div class="app-container">
+            <div class="steps-container">
+                <div class="step slide-up" style="animation-delay: 0.1s">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <h2 class="step-title">Upload Your Resume</h2>
+                    </div>
+                    <div class="upload-area" id="dropZone">
+                        <div class="upload-icon">📄</div>
+                        <p class="upload-text">Drag & drop your resume here</p>
+                        <p class="upload-hint">or click to browse files (PDF or DOCX)</p>
+                        <input type="file" id="resumeFile" accept=".pdf,.docx">
+                    </div>
+                    <div id="resumeInfo" class="resume-info hidden">
+                        <h3>Resume Information</h3>
+                        <div class="resume-details">
+                            <div class="resume-section">
+                                <h4>Contact Info</h4>
+                                <p id="resumeContact">Loading...</p>
+                            </div>
+                            <div class="resume-section">
+                                <h4>Experience</h4>
+                                <p id="resumeExperience">Loading...</p>
+                            </div>
+                            <div class="resume-section">
+                                <h4>Education</h4>
+                                <p id="resumeEducation">Loading...</p>
+                            </div>
+                            <div class="resume-section">
+                                <h4>Skills</h4>
+                                <ul id="resumeSkills"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="userInfoForm" class="user-form hidden">
+                        <h3>Please Verify Your Information</h3>
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" id="userName" class="form-input" placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="text" id="userEmail" class="form-input" placeholder="Your email address">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="text" id="userPhone" class="form-input" placeholder="Your phone number">
+                        </div>
+                        <button id="saveUserInfoBtn" class="btn btn-primary">Save Information</button>
+                    </div>
+                </div>
+
+                <div class="step slide-up" style="animation-delay: 0.2s">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h2 class="step-title">Paste Job Description</h2>
+                    </div>
+                    <div class="textarea-container">
+                        <textarea id="jobDescription" placeholder="Paste the job description here..."></textarea>
+                        <button class="voice-input" id="voiceInputBtn" title="Voice Input">
+                            🎤
+                        </button>
+                    </div>
+                    <div id="jdInfo" class="resume-info hidden">
+                        <h3>Job Details</h3>
+                        <div class="resume-details">
+                            <div class="resume-section">
+                                <h4>Company</h4>
+                                <p id="jdCompany">Loading...</p>
+                            </div>
+                            <div class="resume-section">
+                                <h4>Role</h4>
+                                <p id="jdRole">Loading...</p>
+                            </div>
+                            <div class="resume-section">
+                                <h4>Key Requirements</h4>
+                                <ul id="jdRequirements"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step slide-up" style="animation-delay: 0.3s">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h2 class="step-title">Customize Your Letter</h2>
+                </div>
+                <div class="controls">
+                    <div class="control-group">
+                        <label class="control-label">Tone</label>
+                        <select id="toneSelect">
+                            <option value="formal">Formal</option>
+                            <option value="friendly">Friendly</option>
+                            <option value="confident">Confident</option>
+                            <option value="enthusiastic">Enthusiastic</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Template</label>
+                        <select id="templateSelect">
+                            <option value="template-1">Modern (Inter)</option>
+                            <option value="template-2">Classic (Lora)</option>
+                            <option value="template-3">Clean (Poppins)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Theme</label>
+                        <select id="themeSelect">
+                            <option value="theme-light">Light</option>
+                            <option value="theme-professional">Professional</option>
+                            <option value="theme-creative">Creative</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button id="generateBtn" class="btn btn-primary">
+                        <span id="generateText">Generate Cover Letter</span>
+                    </button>
+                    <button id="smartTipsToggle" class="toggle-tips">
+                        <span>💡 Smart Tips</span>
+                        <span>▼</span>
+                    </button>
+                </div>
+                <div id="smartTips" class="smart-tips hidden">
+                    <h3>💡 AI-Powered Writing Tips</h3>
+                    <ul>
+                        <li>Highlight skills that match at least 70% of the job requirements</li>
+                        <li>Use the company name 2-3 times in the letter for personalization</li>
+                        <li>Keep your letter between 250-400 words for optimal impact</li>
+                        <li>Mention 1-2 specific achievements that relate to the role</li>
+                    </ul>
+                </div>
+                <div id="skillMatch" class="hidden">
+                    <h3>🔍 Skill Match Analysis</h3>
+                    <div id="skillMatchContainer"></div>
+                </div>
+            </div>
+
+            <div class="step slide-up" style="animation-delay: 0.4s">
+                <div class="preview-container">
+                    <div class="preview-header">
+                        <h2 class="step-title">Your AI-Generated Cover Letter</h2>
+                        <div class="preview-actions">
+                            <button id="refreshBtn" class="btn btn-outline">🔄 Regenerate</button>
+                            <button id="downloadBtn" class="btn btn-secondary">📄 Download PDF</button>
+                        </div>
+                    </div>
+                    <div id="letterPreview" class="letter-preview hidden">
+                        <!-- Cover letter content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Smartyy - AI Cover Letter Generator</p>
+            <button class="contact-btn" id="contactBtn">Contact Support</button>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">Unlock Premium Feature</h3>
+            <p>Generate your AI-powered cover letter for just ₹69</p>
+            <button id="payNowBtn" class="btn btn-primary" style="width: 100%; margin: 15px 0;">Pay Now</button>
+            <p style="text-align: center; margin: 15px 0;">OR</p>
+            <input type="text" id="promoCode" class="modal-input" placeholder="Enter promo code">
+            <div class="modal-buttons">
+                <button id="cancelPaymentBtn" class="btn btn-outline">Cancel</button>
+                <button id="applyPromoBtn" class="btn btn-primary">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const resumeFileInput = document.getElementById('resumeFile');
+        const dropZone = document.getElementById('dropZone');
+        const jobDescriptionTextarea = document.getElementById('jobDescription');
+        const voiceInputBtn = document.getElementById('voiceInputBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const generateText = document.getElementById('generateText');
+        const letterPreview = document.getElementById('letterPreview');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const smartTipsToggle = document.getElementById('smartTipsToggle');
+        const smartTips = document.getElementById('smartTips');
+        const resumeInfo = document.getElementById('resumeInfo');
+        const jdInfo = document.getElementById('jdInfo');
+        const skillMatch = document.getElementById('skillMatch');
+        const skillMatchContainer = document.getElementById('skillMatchContainer');
+        const userInfoForm = document.getElementById('userInfoForm');
+        const userNameInput = document.getElementById('userName');
+        const userEmailInput = document.getElementById('userEmail');
+        const userPhoneInput = document.getElementById('userPhone');
+        const saveUserInfoBtn = document.getElementById('saveUserInfoBtn');
+        const contactBtn = document.getElementById('contactBtn');
+        
+        // Modal elements
+        const paymentModal = document.getElementById('paymentModal');
+        const payNowBtn = document.getElementById('payNowBtn');
+        const promoCodeInput = document.getElementById('promoCode');
+        const applyPromoBtn = document.getElementById('applyPromoBtn');
+        const cancelPaymentBtn = document.getElementById('cancelPaymentBtn');
+        
+        // Resume data placeholders
+        let resumeData = {
+            name: '',
+            email: '',
+            phone: '',
+            experience: [],
+            education: [],
+            skills: []
+        };
+        
+        // Job description data
+        let jobData = {
+            company: '',
+            role: '',
+            requirements: []
+        };
+
+        // Initialize the app
+        function init() {
+            setupEventListeners();
+            
+            // Initialize PDF.js worker
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.worker.min.js';
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Resume upload
+            dropZone.addEventListener('click', () => resumeFileInput.click());
+            resumeFileInput.addEventListener('change', handleResumeUpload);
+            
+            // Drag and drop
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#6c63ff';
+                dropZone.style.backgroundColor = 'rgba(108, 99, 255, 0.1)';
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.borderColor = '#a29bfe';
+                dropZone.style.backgroundColor = 'transparent';
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#a29bfe';
+                dropZone.style.backgroundColor = 'transparent';
+                
+                if (e.dataTransfer.files.length) {
+                    resumeFileInput.files = e.dataTransfer.files;
+                    handleResumeUpload();
+                }
+            });
+            
+            // Voice input
+            voiceInputBtn.addEventListener('click', startVoiceInput);
+            
+            // Generate button - now shows payment modal first
+            generateBtn.addEventListener('click', showPaymentModal);
+            
+            // Download button
+            downloadBtn.addEventListener('click', downloadAsPDF);
+            
+            // Refresh button
+            refreshBtn.addEventListener('click', generateCoverLetter);
+            
+            // Smart tips toggle
+            smartTipsToggle.addEventListener('click', toggleSmartTips);
+            
+            // Template/theme changes
+            document.getElementById('templateSelect').addEventListener('change', updatePreviewStyles);
+            document.getElementById('themeSelect').addEventListener('change', updatePreviewStyles);
+            
+            // Save user info
+            saveUserInfoBtn.addEventListener('click', saveUserInfo);
+            
+            // Job description changes
+            jobDescriptionTextarea.addEventListener('input', () => {
+                if (jobDescriptionTextarea.value.trim().length > 50) {
+                    analyzeJobDescription();
+                }
+            });
+            
+            // Contact button
+            contactBtn.addEventListener('click', () => {
+                alert('For support, please email: support@smartyy.ai');
+            });
+
+            // Payment modal buttons
+            payNowBtn.addEventListener('click', initiatePayment);
+            applyPromoBtn.addEventListener('click', applyPromoCode);
+            cancelPaymentBtn.addEventListener('click', closePaymentModal);
+        }
+        
+        // Show payment modal
+        function showPaymentModal() {
+            const jdText = jobDescriptionTextarea.value.trim();
+            if (!resumeFileInput.files.length || !jdText) {
+                alert('Please upload your resume and paste the job description first.');
+                return;
+            }
+            
+            if (!resumeData.name || !resumeData.email) {
+                userInfoForm.classList.remove('hidden');
+                alert('Please verify your name and email address');
+                return;
+            }
+
+            paymentModal.style.display = 'flex';
+            promoCodeInput.value = '';
+        }
+
+        // Close payment modal
+        function closePaymentModal() {
+            paymentModal.style.display = 'none';
+        }
+
+        // Apply promo code
+        function applyPromoCode() {
+            const promoCode = promoCodeInput.value.trim();
+            if (promoCode === '070605') {
+                closePaymentModal();
+                generateCoverLetter();
+            } else {
+                alert('Invalid promo code. Please try again or proceed with payment.');
+            }
+        }
+
+        // Initiate Razorpay payment
+        function initiatePayment() {
+            const options = {
+                key: 'rzp_test_1DP5mmOlF5G5ag', // Test key
+                amount: 6900, // ₹69 in paise
+                currency: 'INR',
+                name: 'Smartyy AI',
+                description: 'AI Cover Letter Generation',
+                image: 'https://via.placeholder.com/150',
+                handler: function(response) {
+                    alert('Payment successful! Generating your cover letter...');
+                    closePaymentModal();
+                    generateCoverLetter();
+                },
+                prefill: {
+                    name: resumeData.name,
+                    email: resumeData.email,
+                    contact: resumeData.phone || ''
+                },
+                theme: {
+                    color: '#6c63ff'
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+        }
+        
+        // Handle resume upload - now sends to backend
+        async function handleResumeUpload() {
+            const file = resumeFileInput.files[0];
+            if (!file) return;
+            
+            // Update UI
+            dropZone.innerHTML = `
+                <div class="upload-icon">✔️</div>
+                <p class="upload-text">${file.name}</p>
+                <p class="upload-hint">Click to change file</p>
+            `;
+            
+            try {
+                const formData = new FormData();
+                formData.append('resume', file);
+
+                fetch('https://your-backend-name.onrender.com/upload', {
+
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to parse resume');
+                }
+
+                const data = await response.json();
+                resumeData = data;
+
+                // Update UI with parsed data
+                updateResumeUI();
+                
+                // Show user form if critical info is missing
+                if (!resumeData.name || !resumeData.email) {
+                    userInfoForm.classList.remove('hidden');
+                    if (resumeData.name) userNameInput.value = resumeData.name;
+                    if (resumeData.email) userEmailInput.value = resumeData.email;
+                    if (resumeData.phone) userPhoneInput.value = resumeData.phone;
+                }
+            } catch (error) {
+                console.error('Error parsing resume:', error);
+                alert('Error parsing resume. Please try another file.');
+            }
+        }
+        
+        // Update resume UI with extracted data
+        function updateResumeUI() {
+            document.querySelector('#resumeContact').innerHTML = `
+                <strong>${resumeData.name || 'Your Name'}</strong><br>
+                ${resumeData.email || 'your.email@example.com'}<br>
+                ${resumeData.phone || '(123) 456-7890'}
+            `;
+            
+            const experienceList = resumeData.experience.map(exp => `<li>${exp}</li>`).join('');
+            document.querySelector('#resumeExperience').innerHTML = `<ul>${experienceList}</ul>`;
+            
+            const educationList = resumeData.education.map(edu => `<li>${edu}</li>`).join('');
+            document.querySelector('#resumeEducation').innerHTML = `<ul>${educationList}</ul>`;
+            
+            const skillsList = resumeData.skills.map(skill => `<li>${skill}</li>`).join('');
+            document.querySelector('#resumeSkills').innerHTML = skillsList;
+            
+            // Show skill match if JD is already entered
+            if (jobDescriptionTextarea.value.trim()) {
+                analyzeJobDescription();
+            }
+        }
+        
+        // Save user information from form
+        function saveUserInfo() {
+            resumeData.name = userNameInput.value.trim();
+            resumeData.email = userEmailInput.value.trim();
+            resumeData.phone = userPhoneInput.value.trim();
+            
+            if (!resumeData.name) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            if (!resumeData.email) {
+                alert('Please enter your email');
+                return;
+            }
+            
+            userInfoForm.classList.add('hidden');
+            updateResumeUI();
+        }
+        
+        // Voice input for job description
+        function startVoiceInput() {
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                
+                recognition.onstart = function() {
+                    voiceInputBtn.innerHTML = '🎤';
+                    voiceInputBtn.style.backgroundColor = '#e17055';
+                    jobDescriptionTextarea.placeholder = 'Listening...';
+                };
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    jobDescriptionTextarea.value = transcript;
+                    analyzeJobDescription();
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('Voice recognition error', event.error);
+                    voiceInputBtn.innerHTML = '🎤';
+                    voiceInputBtn.style.backgroundColor = '';
+                    jobDescriptionTextarea.placeholder = 'Paste the job description here...';
+                };
+                
+                recognition.onend = function() {
+                    voiceInputBtn.innerHTML = '🎤';
+                    voiceInputBtn.style.backgroundColor = '';
+                    jobDescriptionTextarea.placeholder = 'Paste the job description here...';
+                };
+                
+                recognition.start();
+            } else {
+                alert('Voice input is not supported in your browser. Please use Chrome or Edge.');
+            }
+        }
+        
+        // Analyze job description - now sends to backend
+        async function analyzeJobDescription() {
+            const jdText = jobDescriptionTextarea.value.trim();
+            if (!jdText) return;
+            
+            jdInfo.classList.remove('hidden');
+            document.querySelector('#jdCompany').textContent = 'Extracting information...';
+            
+            try {
+                const response = await fetch('/analyze-jd', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ jobDescription: jdText })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to analyze job description');
+                }
+
+                const data = await response.json();
+                jobData = data;
+                
+                // Update UI
+                document.querySelector('#jdCompany').textContent = jobData.company;
+                document.querySelector('#jdRole').textContent = jobData.role;
+                
+                const requirementsList = jobData.requirements.map(req => `<li>${req}</li>`).join('');
+                document.querySelector('#jdRequirements').innerHTML = requirementsList;
+                
+                // Show skill match analysis
+                showSkillMatch();
+            } catch (error) {
+                console.error('Error analyzing job description:', error);
+                alert('Error analyzing job description. Please try again.');
+            }
+        }
+        
+        // Show skill match between resume and job
+        function showSkillMatch() {
+            if (!resumeData.skills.length || !jobData.requirements.length) return;
+            
+            skillMatch.classList.remove('hidden');
+            skillMatchContainer.innerHTML = '';
+            
+            // Simple matching algorithm (in a real app, this would be more sophisticated)
+            resumeData.skills.forEach(skill => {
+                const matchedRequirements = jobData.requirements.filter(req => 
+                    req.toLowerCase().includes(skill.toLowerCase()) || 
+                    skill.toLowerCase().includes(req.toLowerCase())
+                );
+                
+                if (matchedRequirements.length) {
+                    const matchPercent = Math.min(100, Math.floor(Math.random() * 30) + 70); // 70-100% for matched skills
+                    
+                    const skillElement = document.createElement('div');
+                    skillElement.className = 'skill-match';
+                    skillElement.innerHTML = `
+                        <div class="skill-name">${skill}</div>
+                        <div class="match-bar">
+                            <div class="match-fill" style="width: ${matchPercent}%"></div>
+                        </div>
+                        <div class="match-percent">${matchPercent}%</div>
+                    `;
+                    
+                    skillMatchContainer.appendChild(skillElement);
+                }
+            });
+            
+            // Add some unmatched requirements
+            if (skillMatchContainer.children.length === 0) {
+                jobData.requirements.slice(0, 3).forEach(req => {
+                    const matchPercent = Math.floor(Math.random() * 50); // 0-50% for unmatched
+                    
+                    const skillElement = document.createElement('div');
+                    skillElement.className = 'skill-match';
+                    skillElement.innerHTML = `
+                        <div class="skill-name">${req}</div>
+                        <div class="match-bar">
+                            <div class="match-fill" style="width: ${matchPercent}%"></div>
+                        </div>
+                        <div class="match-percent">${matchPercent}%</div>
+                    `;
+                    
+                    skillMatchContainer.appendChild(skillElement);
+                });
+            }
+        }
+        
+        // Generate cover letter using backend API
+        async function generateCoverLetter() {
+            const jdText = jobDescriptionTextarea.value.trim();
+            if (!resumeFileInput.files.length || !jdText) {
+                alert('Please upload your resume and paste the job description first.');
+                return;
+            }
+            
+            if (!resumeData.name || !resumeData.email) {
+                userInfoForm.classList.remove('hidden');
+                alert('Please verify your name and email address');
+                return;
+            }
+
+            // Show loading state
+            generateText.textContent = 'Generating...';
+            generateBtn.disabled = true;
+            
+            try {
+                // Prepare the request data
+                const requestData = {
+                    resumeData: resumeData,
+                    jobDescription: jdText,
+                    tone: document.getElementById('toneSelect').value
+                };
+
+                // Call backend API
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate cover letter');
+                }
+
+                const data = await response.json();
+                
+                if (data.coverLetter) {
+                    const today = new Date().toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    });
+                    
+                    letterPreview.innerHTML = `
+                        <div class="letter-content">
+                            <p>${today}</p>
+                            ${data.coverLetter}
+                            <p>Sincerely,<br>${resumeData.name}</p>
+                            <p>${resumeData.email}<br>${resumeData.phone || ''}</p>
+                        </div>
+                    `;
+                    letterPreview.classList.remove('hidden');
+                    updatePreviewStyles();
+                    
+                    // Scroll to preview
+                    letterPreview.scrollIntoView({ behavior: 'smooth' });
+                }
+            } catch (error) {
+                console.error('Error generating cover letter:', error);
+                alert('Error generating cover letter. Please try again.');
+            } finally {
+                // Reset button state
+                generateText.textContent = 'Generate Cover Letter';
+                generateBtn.disabled = false;
+            }
+        }
+        
+        // Update preview styles based on selected template and theme
+        function updatePreviewStyles() {
+            const template = document.getElementById('templateSelect').value;
+            const theme = document.getElementById('themeSelect').value;
+            
+            // Reset all classes
+            letterPreview.className = 'letter-preview';
+            
+            // Add selected classes
+            letterPreview.classList.add(template);
+            letterPreview.classList.add(theme);
+        }
+        
+        // Download as PDF
+        function downloadAsPDF() {
+            if (letterPreview.classList.contains('hidden')) {
+                alert('Please generate a cover letter first.');
+                return;
+            }
+            
+            const filename = `${resumeData.name.replace(' ', '_')}_${jobData.company.replace(' ', '_')}_Cover_Letter.pdf`;
+            const element = letterPreview.cloneNode(true);
+            
+            // Temporarily remove hidden class and add specific PDF styling
+            element.classList.remove('hidden');
+            element.style.padding = '40px';
+            element.style.minHeight = 'auto';
+            
+            document.body.appendChild(element);
+            
+            const opt = {
+                margin: 10,
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    logging: true,
+                    useCORS: true
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // Generate PDF
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Clean up
+                document.body.removeChild(element);
+            });
+        }
+        
+        // Toggle smart tips visibility
+        function toggleSmartTips() {
+            smartTips.classList.toggle('hidden');
+            const arrow = smartTipsToggle.querySelector('span:last-child');
+            arrow.textContent = smartTips.classList.contains('hidden') ? '▼' : '▲';
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
