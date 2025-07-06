@@ -1031,7 +1031,7 @@
                 const formData = new FormData();
                 formData.append('resume', file);
 
-                fetch('https://your-backend-name.onrender.com/upload', {
+                fetch('https://smartyy-backend.onrender.com/upload'), {
 
                     method: 'POST',
                     body: formData
@@ -1150,7 +1150,7 @@
             document.querySelector('#jdCompany').textContent = 'Extracting information...';
             
             try {
-                const response = await fetch('/analyze-jd', {
+                const response = await fetch('https://smartyy-backend.onrender.com/analyze-jd', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1258,7 +1258,8 @@
                 };
 
                 // Call backend API
-                const response = await fetch('/generate', {
+                const response = await fetch('https://smartyy-backend.onrender.com/generate', {
+
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
